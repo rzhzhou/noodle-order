@@ -1,19 +1,21 @@
-{
-  "name": "noodle-order-mp",
-  "version": "1.0.0",
-  "description": "粉面下单系统 - 微信小程序",
-  "private": true,
-  "scripts": {
-    "dev:mp-weixin": "uni -p mp-weixin",
-    "build:mp-weixin": "uni build -p mp-weixin"
-  },
-  "dependencies": {
-    "vue": "^3.4.0"
-  },
-  "devDependencies": {
-    "@dcloudio/uni-app": "3.0.0-alpha-5010320260611001",
-    "@dcloudio/uni-mp-weixin": "3.0.0-alpha-5010320260611001",
-    "@dcloudio/vite-plugin-uni": "3.0.0-alpha-5010320260611001",
-    "vite": "5.2.8"
-  }
+﻿{
+    "name":  "noodle-order-mp",
+    "version":  "1.0.0",
+    "description":  "粉面下单系统 - 微信小程序",
+    "private":  true,
+    "scripts":  {
+                    "dev:mp-weixin":  "uni -p mp-weixin",
+                    "build:mp-weixin":  "uni build -p mp-weixin",
+                    "dev:h5":  "uni -p h5",
+                    "build:h5":  "uni build -p h5"
+                },
+    "dependencies":  {
+                         "vue":  "^3.4.0"
+                     },
+    "devDependencies":  {
+                            "@dcloudio/uni-app":  "3.0.0-alpha-5010320260611001",
+                            "@dcloudio/uni-mp-weixin":  "3.0.0-alpha-5010320260611001",
+                            "@dcloudio/vite-plugin-uni":  "3.0.0-alpha-5010320260611001",
+                            "vite":  "5.2.8"
+                        }
 }

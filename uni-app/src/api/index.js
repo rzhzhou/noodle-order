@@ -1,4 +1,5 @@
-const API_BASE = "https://lighthearted-sprite-d4785b.netlify.app/api";
+﻿// API base URL - 优先使用环境变量，H5 默认走本地代理
+const API_BASE = import.meta.env.VITE_API_BASE || "/api";
 
 async function request(url, method, data) {
   return new Promise((resolve, reject) => {
