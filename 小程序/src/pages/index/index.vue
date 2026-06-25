@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="page">
     <!-- Header -->
     <div class="header">
@@ -187,8 +187,9 @@ onUnmounted(() => {
 }
 .cat-item {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
+  gap: 6px;
   padding: 14px 8px;
   cursor: pointer;
   position: relative;
@@ -208,10 +209,9 @@ onUnmounted(() => {
   border-radius: 0 3px 3px 0;
 }
 .cat-dot {
-  width: 24px;
-  height: 24px;
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
-  margin-bottom: 4px;
 }
 .dot-0 { background: linear-gradient(135deg, #f56c6c, #ff9a76); }
 .dot-1 { background: linear-gradient(135deg, #ff9a76, #fad06c); }
@@ -296,6 +296,12 @@ onUnmounted(() => {
   margin-left: 2px;
 }
 
+.food-action {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
 .qty-wrap { display: flex; align-items: center; gap: 6px; }
 .qty-btn {
   width: 24px; height: 24px;
@@ -356,3 +362,5 @@ onUnmounted(() => {
 }
 .cart-arrow { font-size: 14px; }
 </style>
+
+
