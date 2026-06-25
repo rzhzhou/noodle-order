@@ -1,6 +1,12 @@
 [build]
   publish = "dist"
+  command = "npm run build"
 
+[functions]
+  directory = "netlify/functions"
+  node_bundler = "nft"
+
+# SPA fallback
 [[redirects]]
   from = "/*"
   to = "/index.html"
