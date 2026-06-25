@@ -1,4 +1,4 @@
-﻿import { defineConfig } from "vite";
+import { defineConfig } from "vite";
 import uni from "@dcloudio/vite-plugin-uni";
 
 export default defineConfig({
@@ -11,5 +11,8 @@ export default defineConfig({
         changeOrigin: true,
       },
     },
+  },
+  build: {
+    outDir: "dist/build/h5",
   },
 });

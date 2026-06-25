@@ -1,1 +1,21 @@
-{"name":"noodle-order-mp","appid":"请替换为你的微信小程序AppID","version":"1.0.0","description":"粉面下单系统","uni-app":{"scripts":{"mp-weixin":{"title":"微信小程序"}}}}
+{
+  "name": "noodle-order-mp",
+  "appid": "请替换为你的微信小程序AppID",
+  "version": "1.0.0",
+  "description": "粉面下单系统",
+  "uni-app": {
+    "scripts": {
+      "mp-weixin": {
+        "title": "微信小程序"
+      }
+    }
+  },
+  "h5": {
+    "router": {
+      "mode": "hash"
+    },
+    "sdkConfigs": {
+      "maps": {}
+    }
+  }
+}
