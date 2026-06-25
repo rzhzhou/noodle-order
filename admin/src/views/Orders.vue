@@ -1,50 +1,67 @@
-<template>
+﻿<template>
   <div>
     <h2 class="page-title">📋 订单管理</h2>
 
-    <div class="card">
-      <table class="table" v-if="orders.length">
-        <thead>
-          <tr>
-            <th>ID</th><th>下单人</th><th>单位</th><th>商品</th>
-            <th>金额</th><th>状态</th><th>备注</th><th>时间</th><th>操作</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="order in orders" :key="order.id">
-            <td>#{{ order.id }}</td>
-            <td>{{ order.userName || order.userId }}</td>
-            <td><span class="tag">{{ order.userUnit }}</span></td>
-            <td>
-              <div v-for="item in order.items" :key="item.id" class="item-line">
-                {{ item.productName }} × {{ item.quantity }}
-              </div>
-            </td>
-            <td class="price">¥{{ order.totalAmount?.toFixed(2) }}</td>
-            <td>
-              <span :class="['badge', order.status]">{{ statusMap[order.status] || order.status }}</span>
-            </td>
-            <td class="note">{{ order.note || "-" }}</td>
-            <td class="time">{{ formatTime(order.createdAt) }}</td>
-            <td class="actions">
-              <button v-if="order.status === 'pending'" class="btn-confirm" @click="confirmOrder(order)">确认</button>
-              <button v-if="order.status === 'pending'" class="btn-cancel" @click="cancelOrder(order)">取消</button>
-              <span v-else class="done">-</span>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-      <div v-else class="empty-hint">暂无订单</div>
-    </div>
+    <el-card shadow="hover">
+      <el-table :data="orders" stripe size="small" style="width:100%">
+        <el-table-column prop="id" label="ID" width="60">
+          <template #default="{ row }">#{{ row.id }}</template>
+        </el-table-column>
+        <el-table-column label="下单人" width="100">
+          <template #default="{ row }">{{ row.userName || row.userId }}</template>
+        </el-table-column>
+        <el-table-column label="单位" width="100">
+          <template #default="{ row }">
+            <el-tag>{{ row.userUnit }}</el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column label="商品" min-width="160">
+          <template #default="{ row }">
+            <div v-for="item in row.items" :key="item.id" class="item-line">
+              {{ item.productName }} × {{ item.quantity }}
+            </div>
+          </template>
+        </el-table-column>
+        <el-table-column label="金额" width="90">
+          <template #default="{ row }">
+            <span class="price">¥{{ row.totalAmount?.toFixed(2) }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="状态" width="100" align="center">
+          <template #default="{ row }">
+            <el-tag :type="statusType(row.status)" size="small">
+              {{ statusMap[row.status] || row.status }}
+            </el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column label="备注" width="120">
+          <template #default="{ row }">{{ row.note || "-" }}</template>
+        </el-table-column>
+        <el-table-column label="时间" width="100">
+          <template #default="{ row }">{{ formatTime(row.createdAt) }}</template>
+        </el-table-column>
+        <el-table-column label="操作" width="160" align="center">
+          <template #default="{ row }">
+            <template v-if="row.status === 'pending'">
+              <el-button size="small" type="success" @click="confirmOrder(row)">确认</el-button>
+              <el-button size="small" type="danger" @click="cancelOrder(row)">取消</el-button>
+            </template>
+            <span v-else class="done">-</span>
+          </template>
+        </el-table-column>
+      </el-table>
+    </el-card>
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted } from "vue";
 import { get, put } from "../api/index.js";
+import { ElMessage } from "element-plus";
 
 const orders = ref([]);
 const statusMap = { pending: "待确认", confirmed: "已确认", completed: "已完成", cancelled: "已取消" };
+const statusType = (s) => ({ pending: "warning", confirmed: "success", completed: "primary", cancelled: "info" }[s] || "");
 
 function formatTime(t) {
   if (!t) return "-";
@@ -59,16 +76,17 @@ async function load() {
 async function confirmOrder(order) {
   try {
     await put("/orders/" + order.id + "/status", { status: "confirmed" });
+    ElMessage.success("已确认");
     await load();
-  } catch (e) { alert("操作失败"); }
+  } catch (e) { ElMessage.error("操作失败"); }
 }
 
 async function cancelOrder(order) {
-  if (!confirm("确定取消该订单？")) return;
   try {
     await put("/orders/" + order.id + "/status", { status: "cancelled" });
+    ElMessage.success("已取消");
     await load();
-  } catch (e) { alert("操作失败"); }
+  } catch (e) { ElMessage.error("操作失败"); }
 }
 
 onMounted(load);
@@ -76,23 +94,7 @@ onMounted(load);
 
 <style scoped>
 .page-title { font-size: 22px; margin-bottom: 16px; }
-.card { background: #fff; border-radius: 12px; padding: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
-.table { width: 100%; border-collapse: collapse; font-size: 13px; }
-.table th, .table td { padding: 10px 12px; text-align: left; border-bottom: 1px solid #f0f0f0; }
-.table th { color: #999; font-weight: 500; background: #fafafa; white-space: nowrap; }
-.tag { background: #f0f9ff; color: #409eff; padding: 2px 10px; border-radius: 10px; font-size: 12px; white-space: nowrap; }
 .price { color: #f56c6c; font-weight: 700; }
-.note { max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #999; }
-.time { white-space: nowrap; color: #999; font-size: 12px; }
-.badge { padding: 2px 10px; border-radius: 10px; font-size: 12px; white-space: nowrap; }
-.badge.pending { background: #fff3e0; color: #f57c00; }
-.badge.confirmed { background: #e8f5e9; color: #388e3c; }
-.badge.cancelled { background: #fce4ec; color: #c62828; }
-.badge.completed { background: #e3f2fd; color: #1976d2; }
-.actions { display: flex; gap: 6px; }
-.btn-confirm { padding: 4px 12px; background: #67c23a; color: #fff; border: none; border-radius: 6px; font-size: 12px; cursor: pointer; }
-.btn-cancel { padding: 4px 12px; background: #f56c6c; color: #fff; border: none; border-radius: 6px; font-size: 12px; cursor: pointer; }
-.done { color: #ccc; font-size: 12px; }
 .item-line { padding: 2px 0; }
-.empty-hint { color: #ccc; text-align: center; padding: 40px 0; font-size: 14px; }
+.done { color: #ccc; font-size: 12px; }
 </style>

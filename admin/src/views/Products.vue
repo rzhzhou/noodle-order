@@ -1,73 +1,125 @@
-<template>
+﻿<template>
   <div>
     <div class="header-row">
-      <h2 class="page-title">📦 商品管理</h2>
-      <button class="btn btn-primary" @click="openEdit(null)">+ 新增商品</button>
+      <h2 class="page-title">📝 商品管理</h2>
+      <el-button type="danger" @click="openEdit(null)">+ 新增商品</el-button>
     </div>
 
-    <div class="card">
-      <table class="table" v-if="products.length">
-        <thead>
-          <tr><th>ID</th><th>名称</th><th>分类</th><th>价格</th><th>单位</th><th>限购</th><th>状态</th><th>排序</th><th>操作</th></tr>
-        </thead>
-        <tbody>
-          <tr v-for="p in products" :key="p.id">
-            <td>{{ p.id }}</td>
-            <td><strong>{{ p.name }}</strong></td>
-            <td><span class="tag">{{ p.category }}</span></td>
-            <td>¥{{ p.price?.toFixed(2) }}</td>
-            <td>{{ p.unit }}</td>
-            <td>{{ p.maxPerOrder }}</td>
-            <td><span :class="['badge', p.available ? 'on' : 'off']">{{ p.available ? "上架" : "下架" }}</span></td>
-            <td>{{ p.sortOrder }}</td>
-            <td class="actions">
-              <button class="btn-sm" @click="openEdit(p)">✏️</button>
-              <button class="btn-sm" @click="deleteProduct(p)">🗑️</button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-      <div v-else class="empty-hint">暂无商品</div>
-    </div>
+    <el-card shadow="hover">
+      <el-table :data="products" stripe size="small" style="width:100%">
+        <el-table-column prop="id" label="ID" width="60" />
+        <el-table-column label="图片" width="80" align="center">
+          <template #default="{ row }">
+            <el-image v-if="row.image" :src="row.image" style="width:48px;height:48px" fit="cover" class="product-thumb" />
+            <span v-else class="no-img">-</span>
+          </template>
+        </el-table-column>
+        <el-table-column prop="name" label="名称" min-width="120" />
+        <el-table-column label="分类" width="80">
+          <template #default="{ row }">
+            <el-tag>{{ row.category }}</el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column prop="price" label="价格" width="80">
+          <template #default="{ row }">¥{{ row.price?.toFixed(2) }}</template>
+        </el-table-column>
+        <el-table-column prop="unit" label="单位" width="60" />
+        <el-table-column prop="maxPerOrder" label="限购" width="60" align="center" />
+        <el-table-column label="状态" width="80" align="center">
+          <template #default="{ row }">
+            <el-tag :type="row.available ? 'success' : 'danger'" size="small">
+              {{ row.available ? "上架" : "下架" }}
+            </el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column prop="sortOrder" label="排序" width="60" align="center" />
+        <el-table-column label="操作" width="120" align="center">
+          <template #default="{ row }">
+            <el-button size="small" circle @click="openEdit(row)">
+              <el-icon><Edit /></el-icon>
+            </el-button>
+            <el-button size="small" type="danger" circle @click="deleteProduct(row)">
+              <el-icon><Delete /></el-icon>
+            </el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+    </el-card>
 
-    <!-- Edit Modal -->
-    <div v-if="showModal" class="modal-overlay" @click.self="showModal=false">
-      <div class="modal">
-        <h3>{{ editing ? "编辑商品" : "新增商品" }}</h3>
-        <div class="form">
-          <div class="row"><label>名称</label><input v-model="form.name" /></div>
-          <div class="row"><label>分类</label>
-            <select v-model="form.category">
-              <option v-for="c in categories" :key="c">{{ c }}</option>
-            </select>
-          </div>
-          <div class="row"><label>价格</label><input v-model.number="form.price" type="number" step="0.01" /></div>
-          <div class="row"><label>单位</label><input v-model="form.unit" /></div>
-          <div class="row"><label>描述</label><input v-model="form.description" /></div>
-          <div class="row"><label>限购</label><input v-model.number="form.maxPerOrder" type="number" /></div>
-          <div class="row"><label>排序</label><input v-model.number="form.sortOrder" type="number" /></div>
-          <div class="row"><label>上架</label>
-            <label class="switch"><input type="checkbox" v-model="form.available" /><span></span></label>
-          </div>
-        </div>
-        <div class="modal-actions">
-          <button class="btn" @click="showModal=false">取消</button>
-          <button class="btn btn-primary" @click="saveProduct">保存</button>
-        </div>
-      </div>
-    </div>
+    <!-- Edit Dialog -->
+    <el-dialog v-model="showModal" :title="editing ? '编辑商品' : '新增商品'" width="560px" :close-on-click-modal="false">
+      <el-form :model="form" label-width="80px" size="small">
+        <el-form-item label="名称">
+          <el-input v-model="form.name" />
+        </el-form-item>
+        <el-form-item label="分类">
+          <el-select v-model="form.category" style="width:100%">
+            <el-option v-for="c in categories" :key="c" :label="c" :value="c" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="价格">
+          <el-input-number v-model="form.price" :min="0" :step="0.5" :precision="2" style="width:100%" />
+        </el-form-item>
+        <el-form-item label="单位">
+          <el-input v-model="form.unit" />
+        </el-form-item>
+        <el-form-item label="描述">
+          <el-input v-model="form.description" />
+        </el-form-item>
+        <el-form-item label="商品图片">
+          <el-upload
+            :auto-upload="false"
+            :show-file-list="false"
+            accept="image/*"
+            @change="onImageChange"
+          >
+            <template #trigger>
+              <el-button type="primary">选择图片</el-button>
+            </template>
+            <div v-if="form.image" class="image-preview-wrap">
+              <el-image :src="form.image" class="image-preview" fit="contain" />
+              <el-button size="small" circle type="danger" class="img-remove" @click="form.image = ''">
+                <el-icon><Close /></el-icon>
+              </el-button>
+            </div>
+          </el-upload>
+        </el-form-item>
+        <el-form-item label="限购">
+          <el-input-number v-model="form.maxPerOrder" :min="1" :max="999" style="width:100%" />
+        </el-form-item>
+        <el-form-item label="排序">
+          <el-input-number v-model="form.sortOrder" :min="0" :max="999" style="width:100%" />
+        </el-form-item>
+        <el-form-item label="上架">
+          <el-switch v-model="form.available" />
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <el-button @click="showModal = false">取消</el-button>
+        <el-button type="danger" @click="saveProduct">保存</el-button>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted } from "vue";
 import { get, post, put, del } from "../api/index.js";
+import { ElMessage, ElMessageBox } from "element-plus";
 
 const products = ref([]);
-const categories = ref(["汤粉", "干拌", "加料", "饮品"]);
+const categories = ref(["汤粉", "干捞", "加料", "饮品"]);
 const showModal = ref(false);
 const editing = ref(null);
 const form = ref({});
+
+function onImageChange(uploadFile) {
+  const file = uploadFile.raw;
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (ev) => { form.value.image = ev.target.result; };
+  reader.readAsDataURL(file);
+}
 
 async function load() {
   try { products.value = await get("/products") || []; }
@@ -76,7 +128,9 @@ async function load() {
 
 function openEdit(product) {
   editing.value = product;
-  form.value = product ? { ...product } : { name: "", category: "汤粉", price: 0, unit: "份", description: "", maxPerOrder: 99, sortOrder: 1, available: true };
+  form.value = product
+    ? { ...product }
+    : { name: "", category: "汤粉", price: 0, unit: "份", description: "", image: "", maxPerOrder: 99, sortOrder: 1, available: true };
   showModal.value = true;
 }
 
@@ -84,20 +138,27 @@ async function saveProduct() {
   try {
     if (editing.value) {
       await put("/products/" + editing.value.id, form.value);
+      ElMessage.success("修改成功");
     } else {
       await post("/products", form.value);
+      ElMessage.success("新增成功");
     }
     showModal.value = false;
     await load();
-  } catch (e) { alert("保存失败: " + e.message); }
+  } catch (e) {
+    ElMessage.error("保存失败: " + e.message);
+  }
 }
 
 async function deleteProduct(p) {
-  if (!confirm("确定删除「" + p.name + "」？")) return;
   try {
+    await ElMessageBox.confirm("确定删除「" + p.name + "」？", "确认删除", { type: "warning" });
     await del("/products/" + p.id);
+    ElMessage.success("删除成功");
     await load();
-  } catch (e) { alert("删除失败"); }
+  } catch (e) {
+    if (e !== "cancel") ElMessage.error("删除失败");
+  }
 }
 
 onMounted(load);
@@ -105,31 +166,10 @@ onMounted(load);
 
 <style scoped>
 .header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
-.page-title { font-size: 22px; }
-.card { background: #fff; border-radius: 12px; padding: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
-.table { width: 100%; border-collapse: collapse; font-size: 13px; }
-.table th, .table td { padding: 10px 12px; text-align: left; border-bottom: 1px solid #f0f0f0; }
-.table th { color: #999; font-weight: 500; background: #fafafa; }
-.tag { background: #f0f9ff; color: #409eff; padding: 2px 10px; border-radius: 10px; font-size: 12px; }
-.badge { padding: 2px 10px; border-radius: 10px; font-size: 12px; }
-.badge.on { background: #e8f5e9; color: #388e3c; }
-.badge.off { background: #fce4ec; color: #c62828; }
-.actions { display: flex; gap: 6px; }
-.btn-sm { background: none; border: 1px solid #ddd; border-radius: 6px; padding: 4px 10px; cursor: pointer; font-size: 14px; }
-.btn { padding: 8px 20px; border-radius: 8px; border: 1px solid #ddd; background: #fff; cursor: pointer; font-size: 13px; }
-.btn-primary { background: #f56c6c; color: #fff; border-color: #f56c6c; }
-.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; z-index: 200; }
-.modal { background: #fff; border-radius: 16px; padding: 24px; width: 480px; max-height: 80vh; overflow-y: auto; }
-.modal h3 { margin-bottom: 16px; }
-.form .row { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
-.form .row label { min-width: 60px; font-size: 13px; color: #666; }
-.form .row input, .form .row select { flex: 1; padding: 8px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 13px; }
-.switch { position: relative; display: inline-block; width: 40px; height: 22px; }
-.switch input { opacity: 0; width: 0; height: 0; }
-.switch span { position: absolute; cursor: pointer; inset: 0; background: #ccc; border-radius: 22px; transition: 0.3s; }
-.switch span:before { content: ""; position: absolute; height: 18px; width: 18px; left: 2px; bottom: 2px; background: #fff; border-radius: 50%; transition: 0.3s; }
-.switch input:checked + span { background: #f56c6c; }
-.switch input:checked + span:before { transform: translateX(18px); }
-.modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; }
-.empty-hint { color: #ccc; text-align: center; padding: 40px 0; font-size: 14px; }
+.page-title { font-size: 22px; margin: 0; }
+.product-thumb { border-radius: 6px; border: 1px solid #eee; }
+.no-img { color: #ccc; font-size: 12px; }
+.image-preview-wrap { display: inline-flex; align-items: center; gap: 8px; margin-top: 8px; position: relative; }
+.image-preview { max-width: 160px; max-height: 120px; border-radius: 8px; border: 1px solid #eee; }
+.img-remove { position: absolute; top: -8px; right: -8px; }
 </style>
