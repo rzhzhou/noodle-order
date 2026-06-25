@@ -1,0 +1,23 @@
+# Node
+node_modules/
+dist/
+*.pid
+*.log
+
+# Java
+backend/target/
+*.jar
+backend/data/
+
+# IDE
+.idea/
+*.iml
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Env
+.env
+.env.local
