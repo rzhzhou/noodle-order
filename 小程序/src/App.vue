@@ -52,10 +52,10 @@ const currentTitle = computed(() => route.meta?.title || "粉面下单");
   display: flex; border-top: 1px solid #eee; z-index: 200;
 }
 .tab-item {
-  flex: 1; display: flex; flex-direction: column; align-items: center;
-  padding: 6px 0 10px; text-decoration: none; color: #999; font-size: 11px;
+  flex: 1; display: flex; align-items: center; justify-content: center;
+  gap: 4px; padding: 10px 0; text-decoration: none; color: #999; font-size: 11px;
 }
 .tab-item.active { color: #f56c6c; }
-.tab-icon { font-size: 22px; margin-bottom: 2px; }
-.tab-text { font-size: 11px; }
+.tab-icon { font-size: 18px; }
+.tab-text { font-size: 12px; }
 </style>

@@ -1,4 +1,4 @@
-import { createRouter, createWebHashHistory } from "vue-router";
+﻿import { createRouter, createWebHashHistory } from "vue-router";
 
 import Index from "../pages/index/index.vue";
 import Cart from "../pages/cart/cart.vue";
@@ -12,6 +12,8 @@ const routes = [
   { path: "/order", component: Order, meta: { title: "订单" } },
   { path: "/profile", component: Profile, meta: { title: "我的" } },
   { path: "/checkout", component: () => import("../pages/checkout/checkout.vue"), meta: { title: "确认下单" } },
+  { path: "/login", component: () => import("../pages/login/login.vue"), meta: { title: "管理员登录" } },
+  { path: "/admin", component: () => import("../pages/admin/admin.vue"), meta: { title: "管理后台" } },
 ];
 
 const router = createRouter({
